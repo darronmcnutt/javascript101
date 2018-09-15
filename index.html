@@ -34,7 +34,7 @@
     }
 
     .red {
-        background-image: red;
+        background-color: red;
     }
 
     .blue {
@@ -42,7 +42,7 @@
     }
 
     .gold {
-        background-image: gold;
+        background-color: gold;
     }
 </style>
 
@@ -82,11 +82,16 @@
     }
 
     function initDocument() {
+        
         clearDocument();
+        
         var rootDiv = document.createElement('div');
         rootDiv.id = 'rootContainer';
+        
         var companyNamesContainer = document.createElement('div');
         companyNamesContainer.id = 'companyNamesContainer';
+        companyNamesContainer.className = 'startups-container';
+        
         chicagoStartups.forEach( function(chicagoStartup, index) {
             var childDiv = document.createElement('div');
             var text = document.createTextNode(index.toString().concat(' .) ').concat(chicagoStartup));
@@ -96,6 +101,7 @@
 
         var cleanedContainer = document.createElement('div');
         cleanedContainer.id = 'cleanedContainer';
+        cleanedContainer.className = 'red';
         
         rootDiv.appendChild(companyNamesContainer);
         rootDiv.appendChild(cleanedContainer);
@@ -161,22 +167,51 @@
         console.log('CLEAN AND COUNT CHARACTERS');
         
         var cleanedStartups = [];
+        var charCounter = {};
         const specialChars = /[~`!@#$%^&*()-+{}\[\]:\;'",./<>?]/g;
         
         for (let item of chicagoStartups) {
-            cleanedStartups.push(item.replace(specialChars,'').trim());
+            
+            let cleanedItem = item.replace(specialChars,'').trim();
+            cleanedStartups.push(cleanedItem);
+            
+            // Store character count in object
+            for (let char of cleanedItem) {
+                if (charCounter.hasOwnProperty(char)) {
+                    charCounter[char] = charCounter[char] += 1;
+                } else {
+                    charCounter[char] = 1;
+                }
+            }
         }
         
         var cleanedContainer = document.getElementById('cleanedContainer');
         while (cleanedContainer.hasChildNodes()) {
             cleanedContainer.removeChild(cleanedContainer.lastChild);
         }
+
         cleanedStartups.forEach( function(chicagoStartup, index) {
             var childDiv = document.createElement('div');
             var text = document.createTextNode(chicagoStartup.concat(' ').concat(chicagoStartup.length));
             childDiv.appendChild(text);
             cleanedContainer.appendChild(childDiv);
         });
+        
+        var countContainer = document.createElement('div');
+        countContainer.className = 'gold';
+        var childDiv = document.createElement('div');
+        var text = document.createTextNode("CHARACTER COUNT: ");
+        childDiv.appendChild(text);
+        countContainer.appendChild(childDiv);
+
+        for (let count in charCounter) {
+            let childDiv = document.createElement('div');
+            let textNode = document.createTextNode(count + ": " + charCounter[count]);
+            childDiv.appendChild(textNode);
+            countContainer.appendChild(childDiv);
+        }
+
+        cleanedContainer.appendChild(countContainer);
 
         /*
             TODO: REMOVES ANY SPECIAL CHARACTERS FROM EACH COMPANY NAME AND
